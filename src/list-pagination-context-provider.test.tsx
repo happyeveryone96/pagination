@@ -4,8 +4,9 @@ import { screen, render, fireEvent } from '@testing-library/react';
 import ListPaginationContextProvider, { usePaginationContext } from './list-pagination-context-provider';
 
 describe('ListPaginationContextProvider', () => {
-  const NaiveList = (props) => {
+  const NaiveList = () => {
     const { pagination, setNextPage } = usePaginationContext();
+
     return (
       <div>
         <span>{`currentPage: ${pagination.currentPage}`}</span>
@@ -15,9 +16,8 @@ describe('ListPaginationContextProvider', () => {
       </div>
     );
   };
-
-  it.skip('should return currentPage, totalPages, pageSize and view more button', () => {
-    const { getByText } = render(
+  it('should return currentPage, totalPages, pageSize and view more button', () => {
+    render(
       <ListPaginationContextProvider
         value={{
           total: 4,
@@ -28,14 +28,14 @@ describe('ListPaginationContextProvider', () => {
       </ListPaginationContextProvider>,
     );
 
-    expect(getByText('currentPage: 0')).not.toBeNull();
-    expect(getByText('totalPages: 2')).not.toBeNull();
-    expect(getByText('pageSize: 2')).not.toBeNull();
-    expect(getByText('view more')).not.toBeNull();
+    expect(screen.getByText('currentPage: 1')).not.toBeNull();
+    expect(screen.getByText('totalPages: 2')).not.toBeNull();
+    expect(screen.getByText('pageSize: 2')).not.toBeNull();
+    expect(screen.getByText('view more')).not.toBeNull();
   });
 
-  it.skip('should return currentPage, totalPages, pageSize and view more button', () => {
-    const { getByText } = render(
+  it('when the button is clicked, should return currentPage, totalPages, pageSize and view more button', () => {
+    render(
       <ListPaginationContextProvider
         value={{
           total: 4,
@@ -46,11 +46,11 @@ describe('ListPaginationContextProvider', () => {
       </ListPaginationContextProvider>,
     );
 
-    fireEvent.click(getByText('view more'));
+    fireEvent.click(screen.getByText('view more'));
 
-    expect(getByText('currentPage: 1')).not.toBeNull();
-    expect(getByText('totalPages: 2')).not.toBeNull();
-    expect(getByText('pageSize: 2')).not.toBeNull();
+    expect(screen.getByText('currentPage: 2')).not.toBeNull();
+    expect(screen.getByText('totalPages: 2')).not.toBeNull();
+    expect(screen.getByText('pageSize: 2')).not.toBeNull();
     expect(screen.queryByText('view more')).toBeNull();
   });
 });

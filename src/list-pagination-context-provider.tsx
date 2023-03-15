@@ -1,4 +1,5 @@
 import React from 'react';
+import { create } from 'zustand';
 
 type PaginationState = {
   totalItems: number;
@@ -31,10 +32,88 @@ export const usePaginationContext = create<{
     previousEnabled: false,
     totalItems: 0,
   },
-  setPagination: (args: PaginationArgs) => {},
-  setNextPage: () => {},
-  setPrevPage: () => {},
-  setFirstPage: () => {},
+  setPagination: (args: PaginationArgs) => {
+    const totalPages = Math.ceil(args.totalItems / args.pageSize);
+    const { totalItems, pageSize } = args;
+    const { pagination } = get();
+    const { currentPage } = pagination;
+    const nextEnabled = currentPage < totalPages;
+    const previousEnabled = currentPage > INITIAL_PAGE;
+
+    set({
+      pagination: {
+        totalItems,
+        pageSize,
+        totalPages,
+        currentPage,
+        nextEnabled,
+        previousEnabled,
+      },
+    });
+  },
+  setNextPage: () => {
+    const { pagination } = get();
+    const { currentPage, totalPages } = pagination;
+    const nextEnabled = currentPage + 1 < totalPages;
+
+    if (currentPage < totalPages) {
+      set({
+        pagination: {
+          ...pagination,
+          currentPage: currentPage + 1,
+          nextEnabled,
+          previousEnabled: true,
+        },
+      });
+    } else {
+      set({
+        pagination: {
+          ...pagination,
+          nextEnabled: false,
+          previousEnabled: true,
+        },
+      });
+    }
+  },
+  setPrevPage: () => {
+    const { pagination } = get();
+    const { currentPage, totalPages } = pagination;
+    const nextEnabled = currentPage < totalPages;
+    const previousEnabled = currentPage > 2;
+
+    if (currentPage > INITIAL_PAGE) {
+      set({
+        pagination: {
+          ...pagination,
+          currentPage: currentPage - 1,
+          nextEnabled: true,
+          previousEnabled,
+        },
+      });
+    } else {
+      set({
+        pagination: {
+          ...pagination,
+          nextEnabled,
+          previousEnabled: false,
+        },
+      });
+    }
+  },
+  setFirstPage: () => {
+    const { pagination } = get();
+    const { totalPages } = pagination;
+    const nextEnabled = INITIAL_PAGE < totalPages;
+
+    set({
+      pagination: {
+        ...pagination,
+        currentPage: INITIAL_PAGE,
+        nextEnabled,
+        previousEnabled: false,
+      },
+    });
+  },
 }));
 
 export interface ListContextProps {
@@ -46,11 +125,14 @@ type ListPaginationContextProps = ListContextProps;
 
 const ListPaginationContextProvider: FCC<{ value: ListPaginationContextProps }> = ({ children, value }) => {
   const { setPagination } = usePaginationContext();
-
   React.useEffect(() => {
     setPagination({
       pageSize: value.perPage,
       totalItems: value.total,
+      currentPage: 0,
+      totalPages: 0,
+      previousEnabled: false,
+      nextEnabled: false,
     });
   }, [value]);
 
