@@ -34,7 +34,7 @@ describe('ListPaginationContextProvider', () => {
     expect(screen.getByText('view more')).not.toBeNull();
   });
 
-  it('when the button is clicked, should return currentPage, totalPages, pageSize and view more button', () => {
+  it('should return currentPage, totalPages, pageSize and view more button when the button is clicked', () => {
     render(
       <ListPaginationContextProvider
         value={{
