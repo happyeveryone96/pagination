@@ -20,9 +20,10 @@ const INITIAL_PAGE = 1;
 
 export const usePaginationContext = create<{
   pagination: Pagination;
-  setPagination: (pg: Pagination) => void;
+  setPagination: (pg: PaginationArgs) => void;
   setNextPage: () => void;
   setFirstPage: () => void;
+  setPrevPage: () => void;
 }>((set, get) => ({
   pagination: {
     totalPages: 0,
@@ -35,8 +36,7 @@ export const usePaginationContext = create<{
   setPagination: (args: PaginationArgs) => {
     const totalPages = Math.ceil(args.totalItems / args.pageSize);
     const { totalItems, pageSize } = args;
-    const { pagination } = get();
-    const { currentPage } = pagination;
+    const currentPage = INITIAL_PAGE;
     const nextEnabled = currentPage < totalPages;
     const previousEnabled = currentPage > INITIAL_PAGE;
 
@@ -69,8 +69,7 @@ export const usePaginationContext = create<{
   },
   setPrevPage: () => {
     const { pagination } = get();
-    const { currentPage, totalPages } = pagination;
-    const nextEnabled = currentPage < totalPages;
+    const { currentPage } = pagination;
     const previousEnabled = currentPage > 2;
 
     if (currentPage > INITIAL_PAGE) {
@@ -80,14 +79,6 @@ export const usePaginationContext = create<{
           currentPage: currentPage - 1,
           nextEnabled: true,
           previousEnabled,
-        },
-      });
-    } else {
-      set({
-        pagination: {
-          ...pagination,
-          nextEnabled,
-          previousEnabled: false,
         },
       });
     }
@@ -121,10 +112,6 @@ const ListPaginationContextProvider: FCC<{ value: ListPaginationContextProps }> 
     setPagination({
       pageSize: value.perPage,
       totalItems: value.total,
-      currentPage: 0,
-      totalPages: 0,
-      previousEnabled: false,
-      nextEnabled: false,
     });
   }, [value]);
 
