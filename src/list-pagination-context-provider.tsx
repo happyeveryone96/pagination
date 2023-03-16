@@ -65,14 +65,6 @@ export const usePaginationContext = create<{
           previousEnabled: true,
         },
       });
-    } else {
-      set({
-        pagination: {
-          ...pagination,
-          nextEnabled: false,
-          previousEnabled: true,
-        },
-      });
     }
   },
   setPrevPage: () => {
